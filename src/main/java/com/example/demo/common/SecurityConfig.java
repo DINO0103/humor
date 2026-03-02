@@ -1,5 +1,6 @@
 package com.example.demo.common;
 
+import com.example.demo.user.service.UserSecurityService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -22,7 +23,7 @@ public class SecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
             .csrf((csrf) -> csrf
                 .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**"))
-                .ignoringRequestMatchers(new AntPathRequestMatcher("/admin/categories/reorder"))) // AJAX reorder 허용
+                .ignoringRequestMatchers(new AntPathRequestMatcher("/admin/categories/reorder")))
             .headers((headers) -> headers
                 .addHeaderWriter(new XFrameOptionsHeaderWriter(
                     XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))

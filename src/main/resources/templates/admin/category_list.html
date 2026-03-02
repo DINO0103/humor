@@ -177,7 +177,10 @@ $(document).ready(function() {
                 $('.order-badge').each(function(i) { $(this).text(i + 1); });
                 fetch('/admin/categories/reorder', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', [$(\"meta[name='_csrf_header']\").attr(\"content\")]: $(\"meta[name='_csrf']\").attr(\"content\") },
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        [$("meta[name='_csrf_header']").attr("content")]: $("meta[name='_csrf']").attr("content") 
+                    },
                     body: JSON.stringify(ids)
                 });
             }
