@@ -1,0 +1,362 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+:root {
+    --nyt-black: #121212;
+    --nyt-gray: #666666;
+    --nyt-border: #dfdfdf;
+    --nyt-font-serif: 'Playfair Display', 'Noto Serif KR', serif;
+    --nyt-font-sans: 'Noto Sans KR', sans-serif;
+}
+
+body {
+    background-color: #ffffff;
+    font-family: var(--nyt-font-sans);
+    color: var(--nyt-black);
+}
+
+/* Header NYT Style */
+header {
+    border-bottom: 2px solid var(--nyt-black);
+    padding-bottom: 5px;
+    margin-bottom: 20px;
+}
+
+.top-nav {
+    border-bottom: 1px solid var(--nyt-border);
+    padding: 5px 0;
+    font-size: 0.8rem;
+    color: var(--nyt-gray);
+}
+
+.nyt-logo {
+    font-family: var(--nyt-font-serif);
+    font-size: 2.5rem; /* 로고 크기 축소 */
+    font-weight: 700;
+    text-align: center;
+    margin: 15px 0; /* 마진도 살짝 축소 */
+    letter-spacing: -1px; /* 자간 조정 */
+}
+
+.nyt-date-bar {
+    border-top: 1px solid var(--nyt-border);
+    border-bottom: 1px solid var(--nyt-border);
+    padding: 8px 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+/* TodayHumor Style Table */
+.content-container {
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.board-table {
+    width: 100%;
+    border-top: 2px solid var(--nyt-black);
+    margin-top: 20px;
+    font-size: 0.95rem;
+}
+
+.board-table th {
+    background-color: #f8f8f8;
+    border-bottom: 1px solid var(--nyt-border);
+    padding: 12px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.board-table td {
+    padding: 10px;
+    border-bottom: 1px solid var(--nyt-border);
+    text-align: center;
+}
+
+.board-table .title {
+    text-align: left;
+    font-weight: 400;
+}
+
+.board-table tr:hover {
+    background-color: #fcfcfc;
+}
+
+.category-badge {
+    padding: 2px 6px;
+    border: 1px solid var(--nyt-border);
+    border-radius: 3px;
+    font-size: 0.8rem;
+    color: var(--nyt-gray);
+}
+
+.recommend-count {
+    color: #e64946;
+    font-weight: 700;
+}
+
+/* Board Quick Menu (Compact TodayHumor Style) */
+.board-quick-menu {
+    border: 1px solid var(--nyt-border);
+    padding: 8px 10px; /* 패딩 축소 */
+    background-color: #fdfdfd;
+    border-radius: 4px; /* 약간의 라운드 추가 */
+}
+
+.quick-item {
+    flex: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 5px 0; /* 내부 여백 추가하여 하나의 버튼처럼 */
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.quick-item:hover {
+    background-color: #f0f0f0; /* 전체 호버 효과 */
+    transform: translateY(-2px);
+}
+
+.quick-icon {
+    font-size: 1.3rem;
+    margin-bottom: 3px;
+    color: var(--nyt-black); /* 아이콘 색상을 검정으로 통일 */
+}
+
+.quick-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--nyt-black);
+}
+
+/* NYT Style Pagination */
+.nyt-pagination {
+    font-family: var(--nyt-font-serif);
+    border-top: 1px solid var(--nyt-border);
+    border-bottom: 1px solid var(--nyt-border);
+    padding: 15px 0;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    margin-top: 30px;
+}
+
+.nyt-pagination a {
+    color: var(--nyt-black);
+    text-decoration: none;
+    padding: 5px 15px;
+    transition: all 0.2s;
+}
+
+.nyt-pagination a:hover {
+    background-color: #f9f9f9;
+}
+
+.nyt-pagination .page-numbers {
+    display: inline-block;
+}
+
+.nyt-pagination .active {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    font-weight: 900;
+}
+
+.nyt-pagination .disabled {
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* Sidebar NYT Style */
+.sidebar-section {
+    border-left: 1px solid var(--nyt-border);
+    padding-left: 20px;
+}
+
+.section-title {
+    font-family: var(--nyt-font-serif);
+    font-size: 1.2rem;
+    border-bottom: 1px solid var(--nyt-black);
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+/* Admin NYT Style Refined */
+.admin-bg {
+    background-color: #ffffff; /* 순백색 배경 */
+    min-height: 100vh;
+    font-size: 0.85rem; /* 전체적인 폰트 사이즈 축소 */
+}
+
+.island-card {
+    background: #ffffff;
+    border-radius: 0; /* 곡선 제거 */
+    border-top: 2px solid var(--nyt-black); /* 상단 굵은 선 */
+    border-bottom: 1px solid var(--nyt-border);
+    padding: 20px 0;
+    margin-bottom: 40px;
+    box-shadow: none; /* 그림자 제거 */
+}
+
+/* Admin Sidebar Refined - NYT Professional Style */
+.admin-sidebar-island {
+    background: transparent;
+    border-radius: 0;
+    border-right: 1px solid var(--nyt-border);
+    padding: 0 20px 0 0;
+    position: sticky;
+    top: 40px;
+    height: fit-content;
+    min-width: 180px; /* 최소 너비 확보 */
+}
+
+.admin-sidebar-island h6 {
+    font-family: 'Playfair Display', serif;
+    color: var(--nyt-black);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--nyt-black);
+    opacity: 0.9;
+}
+
+.admin-nav-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    margin-bottom: 4px;
+    color: var(--nyt-gray);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem; /* 폰트 크기 소폭 확대 */
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 4px solid transparent;
+    white-space: nowrap; /* 글자가 세로로 길어지지 않게 함 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-nav-item i {
+    width: 24px;
+    margin-right: 15px;
+    font-size: 1.1rem;
+    text-align: center;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.admin-nav-item:hover {
+    color: var(--nyt-black);
+    background-color: #f9fafb;
+    border-left: 4px solid #eeeeee;
+}
+
+.admin-nav-item:hover i {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.admin-nav-item.active {
+    color: var(--nyt-black) !important;
+    background-color: #f3f4f6;
+    font-weight: 700;
+    border-left: 4px solid var(--nyt-black);
+}
+
+.admin-nav-item.active i {
+    color: var(--nyt-black);
+    opacity: 1;
+}
+
+.admin-content-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: var(--nyt-black);
+    border-bottom: 4px double var(--nyt-border);
+    padding-bottom: 15px;
+}
+
+/* NYT Style Table */
+.admin-table {
+    margin-bottom: 0;
+    border-top: 1px solid var(--nyt-black);
+}
+
+.admin-table th {
+    font-family: 'Noto Serif KR', serif;
+    background-color: #ffffff;
+    color: var(--nyt-black);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    padding: 12px 8px;
+    border-bottom: 1px solid var(--nyt-black);
+    white-space: nowrap;
+}
+
+.admin-table td {
+    padding: 12px 8px;
+    vertical-align: middle;
+    color: #333;
+    border-bottom: 1px solid var(--nyt-border);
+    white-space: nowrap; /* 글자가 세로로 보이지 않도록 설정 */
+}
+
+.admin-table tr:hover td {
+    background-color: #f9f9f9;
+}
+
+.admin-table .title-cell {
+    white-space: normal; /* 제목은 예외적으로 줄바꿈 허용하되 최소 너비 확보 */
+    min-width: 250px;
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 600;
+}
+
+.btn-island {
+    border-radius: 0;
+    padding: 6px 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    border: 1px solid var(--nyt-black);
+    background: #ffffff;
+    color: var(--nyt-black);
+    transition: all 0.2s;
+}
+
+.btn-island:hover {
+    background: var(--nyt-black);
+    color: #ffffff;
+    transform: none;
+}
+
+.badge-nyt {
+    border-radius: 0;
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    border: 1px solid var(--nyt-border);
+    background: #ffffff;
+    color: var(--nyt-gray);
+}
+
+footer {
+    margin-top: 50px;
+    padding: 30px 0;
+    border-top: 1px solid var(--nyt-border);
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--nyt-gray);
+}

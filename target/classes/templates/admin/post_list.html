@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('게시물 관리')}"></head>
+<body class="admin-bg">
+<div th:replace="~{common/layout :: header}"></div>
+
+<div class="container content-container py-4">
+    <div class="row g-5">
+        <!-- Sidebar -->
+        <div th:replace="~{common/layout :: adminSidebar('posts')}"></div>
+        
+        <!-- Content -->
+        <div class="col-md-9 col-lg-9">
+            <div class="admin-content-header d-flex justify-content-between align-items-end mb-4">
+                <h2>게시물 아카이브</h2>
+                <div class="text-muted small fw-bold text-uppercase pb-2">검색 결과: <span class="text-dark" th:text="${paging.totalElements}">0</span> 건의 기록</div>
+            </div>
+
+            <!-- NYT Filter Bar -->
+            <div class="island-card mb-4">
+                <form th:action="@{/admin/posts}" method="get" class="row g-3 px-3">
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-uppercase">분류</label>
+                        <select name="category" class="form-select rounded-0 border-dark form-select-sm">
+                            <option value="">전체</option>
+                            <option th:each="cat : ${categoryList}" th:value="${cat.name}" th:text="${cat.name}" th:selected="${cat.name == selectedCategory}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-uppercase">제목 검색</label>
+                        <input type="text" name="title" th:value="${selectedTitle}" class="form-control rounded-0 border-dark form-control-sm">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-uppercase">작성자</label>
+                        <input type="text" name="author" th:value="${selectedAuthor}" class="form-control rounded-0 border-dark form-control-sm">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-uppercase">날짜</label>
+                        <input type="date" name="date" th:value="${selectedDate}" class="form-control rounded-0 border-dark form-control-sm">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-uppercase">상태</label>
+                        <select name="isHidden" class="form-select rounded-0 border-dark form-select-sm">
+                            <option value="">전체</option>
+                            <option value="false" th:selected="${selectedIsHidden == false}">공개 중</option>
+                            <option value="true" th:selected="${selectedIsHidden == true}">숨김 처리</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn btn-island w-100 py-1">필터</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table admin-table align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">ID</th>
+                            <th style="width: 100px;">분류</th>
+                            <th>게시물 제목</th>
+                            <th style="width: 120px;">작성자</th>
+                            <th style="width: 120px;">작성일</th>
+                            <th style="width: 100px;">상태</th>
+                            <th class="text-end" style="width: 100px;">작업</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="post : ${paging}">
+                            <td th:text="${post.id}">1</td>
+                            <td><span class="badge-nyt" th:text="${post.category}">News</span></td>
+                            <td class="title-cell">
+                                <a th:href="@{|/post/detail/${post.id}|}" class="text-decoration-none text-dark" th:text="${post.title}">Title</a>
+                            </td>
+                            <td class="fw-bold" th:text="${post.author}">Author</td>
+                            <td class="text-muted small" th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd')}">2026-03-02</td>
+                            <td>
+                                <span th:if="${post.isHidden}" class="text-danger small fw-bold">숨김</span>
+                                <span th:unless="${post.isHidden}" class="text-success small fw-bold">공개</span>
+                            </td>
+                            <td class="text-end">
+                                <form th:action="@{|/admin/posts/hide/${post.id}|}" method="post">
+                                    <input type="hidden" name="page" th:value="${paging.number}">
+                                    <button type="submit" class="btn btn-island" th:text="${post.isHidden ? '해제' : '숨기기'}">Action</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- NYT Pagination -->
+            <nav th:if="${!paging.isEmpty()}" class="nyt-pagination d-flex justify-content-between align-items-center px-2">
+                <div class="prev-next">
+                    <a th:if="${paging.hasPrevious}" th:href="@{|?page=${paging.number-1}&category=${selectedCategory ?: ''}&title=${selectedTitle ?: ''}&author=${selectedAuthor ?: ''}&date=${selectedDate ?: ''}&isHidden=${selectedIsHidden ?: ''}|}">
+                        &larr; 이전 페이지
+                    </a>
+                    <span th:unless="${paging.hasPrevious}" class="disabled px-3">&larr; 이전 페이지</span>
+                </div>
+                <div class="page-numbers">
+                    <span class="mx-3"><span th:text="${paging.number + 1}">1</span> / <span th:text="${paging.totalPages}">10</span> 페이지</span>
+                </div>
+                <div class="prev-next">
+                    <a th:if="${paging.hasNext}" th:href="@{|?page=${paging.number+1}&category=${selectedCategory ?: ''}&title=${selectedTitle ?: ''}&author=${selectedAuthor ?: ''}&date=${selectedDate ?: ''}&isHidden=${selectedIsHidden ?: ''}|}">
+                        다음 페이지 &rarr;
+                    </a>
+                    <span th:unless="${paging.hasNext}" class="disabled px-3">다음 페이지 &rarr;</span>
+                </div>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{common/layout :: footer}"></div>
+</body>
+</html>

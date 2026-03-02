@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('게시물 작성')}"></head>
+<body>
+
+<div th:replace="~{common/layout :: header}"></div>
+
+<!-- Summernote CSS/JS (Only for this page) -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+
+<div class="container form-container" style="max-width: 900px; margin: 40px auto; padding: 20px;">
+    <h2 class="mb-4" style="font-family: var(--nyt-font-serif); font-weight: 700;">새 게시물 작성</h2>
+    
+    <form th:action="@{/post/create}" method="post" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-3">
+                <label class="form-label fw-bold">카테고리</label>
+                <select name="category" class="form-select" required style="border-radius: 0; border: 1px solid #121212;">
+                    <option value="유머">유머</option>
+                    <option value="베스트">베스트</option>
+                    <option value="정보">정보</option>
+                    <option value="자유">자유</option>
+                </select>
+            </div>
+            <div class="col-md-9">
+                <label class="form-label fw-bold">제목</label>
+                <input type="text" name="title" class="form-control" placeholder="게시물 제목을 입력하세요" required style="border-radius: 0; border: 1px solid #121212;">
+            </div>
+        </div>
+
+        <label class="form-label fw-bold mt-4">내용 (이미지 및 표 삽입 가능)</label>
+        <!-- Summernote Target -->
+        <textarea id="summernote" name="content"></textarea>
+
+        <label class="form-label fw-bold mt-4">첨부 파일</label>
+        <div class="file-upload-wrapper" style="border: 1px solid #121212; padding: 20px;">
+            <input type="file" id="fileInput" class="d-none" multiple>
+            <button type="button" class="btn btn-outline-dark mb-3" onclick="document.getElementById('fileInput').click()" style="border-radius: 0;">
+                <i class="fa-solid fa-plus"></i> 파일 추가
+            </button>
+            
+            <div id="fileList" class="list-group list-group-flush">
+                <!-- Selected files will appear here -->
+            </div>
+            
+            <!-- Hidden real input for form submission -->
+            <input type="file" name="files" id="realFileInput" class="d-none" multiple>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-5">
+            <a th:href="@{/}" class="btn btn-outline-dark" style="border-radius: 0; padding: 10px 30px;">취소</a>
+            <button type="submit" class="btn" style="background-color: #121212; color: white; border-radius: 0; padding: 10px 30px; font-weight: 700;">게시물 등록</button>
+        </div>
+    </form>
+</div>
+
+<div th:replace="~{common/layout :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#summernote').summernote({
+            height: 400,
+            placeholder: '표, 이미지, 멀티미디어를 자유롭게 추가하세요.',
+            tabsize: 2,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']],
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ]
+        });
+
+        // File Upload Logic
+        const fileInput = document.getElementById('fileInput');
+        const realFileInput = document.getElementById('realFileInput');
+        const fileList = document.getElementById('fileList');
+        let selectedFiles = [];
+
+        fileInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                // Prevent duplicate files (optional)
+                if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                    selectedFiles.push(file);
+                    addFileToList(file);
+                }
+            });
+            updateRealFileInput();
+            fileInput.value = ''; // Reset to allow re-selection of same file
+        });
+
+        function addFileToList(file) {
+            const div = document.createElement('div');
+            div.className = 'list-group-item d-flex justify-content-between align-items-center px-0';
+            div.style.borderBottom = '1px solid #eee';
+            div.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-file-lines me-2"></i>
+                    <span>${file.name} <small class="text-muted">(${formatBytes(file.size)})</small></span>
+                </div>
+                <button type="button" class="btn btn-sm text-danger" onclick="removeFile('${file.name}', ${file.size}, this)">
+                    <i class="fa-solid fa-xmark"></i> 삭제
+                </button>
+            `;
+            fileList.appendChild(div);
+        }
+
+        window.removeFile = function(name, size, btn) {
+            selectedFiles = selectedFiles.filter(f => !(f.name === name && f.size === size));
+            btn.closest('.list-group-item').remove();
+            updateRealFileInput();
+        };
+
+        function updateRealFileInput() {
+            const dataTransfer = new DataTransfer();
+            selectedFiles.forEach(file => dataTransfer.items.add(file));
+            realFileInput.files = dataTransfer.files;
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+    });
+</script>
+</body>
+</html>

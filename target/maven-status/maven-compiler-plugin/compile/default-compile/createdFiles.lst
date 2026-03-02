@@ -1,0 +1,17 @@
+com\example\demo\DemoApplication.class
+com\example\demo\user\UserRepository.class
+com\example\demo\common\SecurityConfig.class
+com\example\demo\news\PostRepository.class
+com\example\demo\admin\AdminService.class
+com\example\demo\admin\AdminController.class
+com\example\demo\news\CategoryRepository.class
+com\example\demo\user\UserSecurityService.class
+com\example\demo\news\CommentRepository.class
+com\example\demo\game\GameController.class
+com\example\demo\user\SiteUser.class
+com\example\demo\news\Category.class
+com\example\demo\news\Post.class
+com\example\demo\user\UserService.class
+com\example\demo\news\PostFile.class
+com\example\demo\news\Comment.class
+com\example\demo\news\HomeController.class

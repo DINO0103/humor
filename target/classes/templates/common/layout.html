@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' | The News Humor'">The News Humor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- CSRF Meta Tags for AJAX -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body th:classappend="${globalIsAdmin != null && globalIsAdmin ? 'admin-bg' : ''}">
+
+<div th:fragment="header" class="container-fluid content-container">
+    <!-- Top Utility Nav -->
+    <div class="top-nav d-flex justify-content-between align-items-center">
+        <div class="left-links">
+            <!-- 뉴스홈으로 버튼을 조건 없이 항상 노출 -->
+            <a th:href="@{/}" class="text-decoration-none text-muted small fw-bold me-3"><i class="fa-solid fa-newspaper me-1"></i> 뉴스홈으로</a>
+            <a th:href="@{/game}" class="text-decoration-none text-muted small fw-bold me-3"><i class="fa-solid fa-gamepad me-1"></i> 게임하기</a>
+            <!-- 관리자 버튼은 관리자 페이지가 아닐 때만 노출 -->
+            <a th:if="${globalIsAdmin == null || !globalIsAdmin}" th:href="@{/admin}" sec:authorize="hasRole('ADMIN')" class="text-decoration-none text-danger small fw-bold"><i class="fa-solid fa-user-shield me-1"></i> 관리자</a>
+        </div>
+        <div class="right-links">
+            <a th:href="@{/user/login}" sec:authorize="isAnonymous()" class="me-3 text-decoration-none text-muted small fw-bold">LOGIN</a>
+            <a th:href="@{/user/signup}" sec:authorize="isAnonymous()" class="me-3 text-decoration-none text-muted small fw-bold">SIGN UP</a>
+            <span sec:authorize="isAuthenticated()" class="me-3 small fw-bold" sec:authentication="name">Username</span>
+            <a th:href="@{/user/logout}" sec:authorize="isAuthenticated()" class="me-3 text-decoration-none text-muted small fw-bold">LOGOUT</a>
+        </div>
+    </div>
+
+    <!-- NYT Logo -->
+    <div class="nyt-logo"><a th:href="@{/}" class="text-decoration-none text-dark">The News Humor</a></div>
+
+    <!-- NYT Date Bar (Hidden on Admin) -->
+    <div class="nyt-date-bar d-flex justify-content-between align-items-center" th:if="${globalIsAdmin == null || !globalIsAdmin}">
+        <div th:text="${currentDate}">Monday, March 2, 2026</div>
+        <div class="category-search-box">
+            <form th:action="@{/}" method="get" class="d-flex align-items-center m-0">
+                <span class="me-2 small fw-bold">게시판 찾기</span>
+                <input type="text" name="category" th:value="${selectedCategory}" class="form-control form-control-sm border-0 bg-transparent fw-bold" placeholder="분류명 입력..." style="width: 120px; font-size: 0.85rem; border-bottom: 1px solid #121212 !important; border-radius: 0; box-shadow: none; padding-left: 2px;">
+                <button type="submit" class="btn btn-sm btn-dark ms-2" style="border-radius: 0; font-size: 0.75rem; font-weight: bold;">이동</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Board Quick Menu (Hidden on Admin) -->
+    <div class="board-quick-menu d-flex justify-content-between align-items-center mb-4 mt-4" th:if="${(globalIsAdmin == null || !globalIsAdmin) && activeCategories != null}">
+        <a th:each="cat : ${activeCategories}" th:href="@{/(category=${cat.name})}" class="quick-item text-center text-decoration-none">
+            <i class="fa-solid quick-icon" th:classappend="${cat.icon}"></i>
+            <div class="quick-label" th:text="${cat.name}">카테고리</div>
+        </a>
+    </div>
+</div>
+
+<!-- GAME SECTION HEADER -->
+<div th:fragment="gameHeader" class="container-fluid content-container">
+    <div class="top-nav d-flex justify-content-between align-items-center">
+        <div class="left-links">
+            <a th:href="@{/}" class="text-decoration-none text-muted small fw-bold me-3"><i class="fa-solid fa-newspaper me-1"></i> 뉴스홈으로</a>
+            <a th:href="@{/admin}" sec:authorize="hasRole('ADMIN')" class="text-decoration-none text-danger small fw-bold"><i class="fa-solid fa-user-shield me-1"></i> 관리자</a>
+        </div>
+        <div class="right-links">
+            <a th:href="@{/user/login}" sec:authorize="isAnonymous()" class="me-3 text-decoration-none text-muted small fw-bold">LOGIN</a>
+            <span sec:authorize="isAuthenticated()" class="me-3 small fw-bold" sec:authentication="name">Username</span>
+            <a th:href="@{/user/logout}" sec:authorize="isAuthenticated()" class="me-3 text-decoration-none text-muted small fw-bold">LOGOUT</a>
+        </div>
+    </div>
+
+    <div class="nyt-logo" style="color: #0d6efd;"><a th:href="@{/game}" class="text-decoration-none" style="color: #0d6efd;">The Gaming Humor</a></div>
+
+    <div class="nyt-date-bar d-flex justify-content-between align-items-center" style="border-color: #0d6efd;">
+        <div th:text="${currentDate}">Monday, March 2, 2026</div>
+        <div class="small fw-bold text-primary">CHALLENGE YOUR LIMITS</div>
+    </div>
+
+    <!-- Game Quick Menu -->
+    <div class="board-quick-menu d-flex justify-content-between align-items-center mb-4 mt-4" style="background-color: #f0f7ff; border-color: #0d6efd;">
+        <a th:href="@{/tetris}" class="quick-item text-center text-decoration-none">
+            <i class="fa-solid fa-shapes quick-icon" style="color: #0d6efd;"></i>
+            <div class="quick-label">테트리스</div>
+        </a>
+        <a th:href="@{/snake}" class="quick-item text-center text-decoration-none">
+            <i class="fa-solid fa-worm quick-icon" style="color: #0d6efd;"></i>
+            <div class="quick-label">스네이크</div>
+        </a>
+        <a th:href="@{/minesweeper}" class="quick-item text-center text-decoration-none">
+            <i class="fa-solid fa-bomb quick-icon" style="color: #0d6efd;"></i>
+            <div class="quick-label">지뢰찾기</div>
+        </a>
+        <a th:href="@{/ranking}" class="quick-item text-center text-decoration-none">
+            <i class="fa-solid fa-trophy quick-icon" style="color: #0d6efd;"></i>
+            <div class="quick-label">랭킹</div>
+        </a>
+    </div>
+</div>
+
+<!-- ADMIN SIDEBAR (NYT Professional Style) -->
+<div th:fragment="adminSidebar(activeMenu)" class="col-md-3 col-lg-3">
+    <div class="admin-sidebar-island">
+        <h6>관리자 패널</h6>
+        <nav class="admin-nav">
+            <a th:href="@{/admin/users}" class="admin-nav-item" th:classappend="${activeMenu == 'users' ? 'active' : ''}">
+                <i class="fa-solid fa-users-gear"></i> 
+                <span>사용자 관리</span>
+            </a>
+            <a th:href="@{/admin/categories}" class="admin-nav-item" th:classappend="${activeMenu == 'categories' ? 'active' : ''}">
+                <i class="fa-solid fa-list-check"></i> 
+                <span>분류 관리</span>
+            </a>
+            <a th:href="@{/admin/posts}" class="admin-nav-item" th:classappend="${activeMenu == 'posts' ? 'active' : ''}">
+                <i class="fa-solid fa-newspaper"></i> 
+                <span>게시물 아카이브</span>
+            </a>
+        </nav>
+    </div>
+</div>
+
+<footer th:fragment="footer">
+    <div class="container-fluid content-container">
+        <footer class="mt-5 py-4 border-top text-center text-muted small">
+            <p class="mb-1">© 2026 The News Humor. All rights reserved.</p>
+            <p class="m-0">Contact | Privacy Policy | Terms of Service</p>
+        </footer>
+    </div>
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</footer>
+
+</body>
+</html>

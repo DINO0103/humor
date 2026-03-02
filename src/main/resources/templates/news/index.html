@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{common/layout :: head('Home')}"></head>
+<body>
+
+<div th:replace="~{common/layout :: header}"></div>
+
+<div class="container-fluid content-container">
+    <div class="row mt-4">
+        <!-- Center Board -->
+        <div class="col-lg-9 pe-lg-4">
+            
+            <!-- 1. Board Header Area -->
+            <div class="board-header-area mb-3">
+                <div class="d-flex justify-content-between align-items-end">
+                    <div class="board-title">
+                        <h2 class="section-title mb-0" style="border:none;" th:text="${selectedCategory != null ? selectedCategory : '최근목록'}">최근목록</h2>
+                    </div>
+                    <div class="board-actions">
+                        <div class="btn-group btn-group-sm">
+                            <a th:href="@{/post/create}" class="btn btn-dark">글쓰기</a>
+                            <button class="btn btn-outline-dark">최신글</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 2. Board List Area -->
+            <div class="board-list-area">
+                <table class="board-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">번호</th>
+                            <th style="width: 70px;">분류</th>
+                            <th>제목</th>
+                            <th style="width: 100px;">이름</th>
+                            <th style="width: 80px;">날짜</th>
+                            <th style="width: 60px;">조회</th>
+                            <th style="width: 60px;">추천</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="post, loop : ${paging}">
+                            <!-- 번호 역순 계산: 총 개수 - (현재 페이지 * 페이지당 개수) - 현재 인덱스 -->
+                            <td th:text="${paging.getTotalElements - (paging.getNumber * paging.getSize) - loop.index}">1</td>
+                            <td>
+                                <!-- 분류명으로 아이콘 찾기 (맵 사용) -->
+                                <i th:if="${categoryIconMap.containsKey(post.category)}" 
+                                   th:class="|fa-solid ${categoryIconMap.get(post.category)}|" 
+                                   th:title="${post.category}"></i>
+                                <!-- 아이콘이 없는 경우 (숨겨진 분류 등) 텍스트 노출 -->
+                                <span th:unless="${categoryIconMap.containsKey(post.category)}" 
+                                      class="small text-muted fw-bold" th:text="${post.category}"></span>
+                            </td>
+                            <td class="title">
+                                <a th:href="@{|/post/detail/${post.id}|}" class="text-decoration-none text-dark">
+                                    <span th:text="${post.title}">제목</span>
+                                    <span class="text-danger ms-1 fw-bold" th:if="${post.commentList != null and !post.commentList.isEmpty()}" th:text="'(' + ${post.commentList.size()} + ')'"></span>
+                                </a>
+                            </td>
+                            <td th:text="${post.author}">익명</td>
+                            <td th:text="${post.createDate != null ? #temporals.format(post.createDate, 'HH:mm') : '-'}">12:30</td>
+                            <td th:text="${post.views}">0</td>
+                            <td class="recommend-count" th:text="${post.recommends}">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 3. Pagination Area (NYT Style) -->
+            <div th:if="${!paging.isEmpty()}" class="pagination-area">
+                <div class="nyt-pagination d-flex justify-content-center align-items-center">
+                    <a th:href="@{|?page=${paging.number-1}&category=${selectedCategory != null ? selectedCategory : ''}&kw=${kw}|}" 
+                       th:classappend="${!paging.hasPrevious} ? 'disabled'" class="me-2">
+                       <i class="fa-solid fa-chevron-left"></i>
+                    </a>
+                    
+                    <div class="page-numbers">
+                        <span th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}" 
+                              th:if="${page >= paging.number-5 and page <= paging.number+5}">
+                            <a th:href="@{|?page=${page}&category=${selectedCategory != null ? selectedCategory : ''}&kw=${kw}|}" 
+                               th:text="${page+1}" th:classappend="${page == paging.number} ? 'active'">1</a>
+                        </span>
+                    </div>
+                    
+                    <a th:href="@{|?page=${paging.number+1}&category=${selectedCategory != null ? selectedCategory : ''}&kw=${kw}|}" 
+                       th:classappend="${!paging.hasNext} ? 'disabled'" class="ms-2">
+                       <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 4. Global Search Area -->
+            <div class="search-area mt-4 mb-5">
+                <form th:action="@{/}" method="get" class="d-flex justify-content-center">
+                    <input type="hidden" name="category" th:value="${selectedCategory}">
+                    <div class="input-group" style="max-width: 500px;">
+                        <input type="text" name="kw" class="form-control" th:value="${kw}" placeholder="검색어를 입력하세요 (제목+내용+작성자)" style="border-radius: 0; border: 1px solid #121212;">
+                        <button type="submit" class="btn btn-dark" style="border-radius: 0; padding: 0 25px;">검색</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-3 sidebar-section">
+            <div class="sidebar-content-area">
+                <h3 class="section-title">오늘의 게시물</h3>
+                <ul class="list-unstyled" th:if="${trendingPosts != null and !trendingPosts.isEmpty()}">
+                    <li th:each="tPost, iterStat : ${trendingPosts}" class="mb-3">
+                        <div class="d-flex align-items-start">
+                            <span class="me-2 fw-bold text-muted" style="font-size: 1.1rem; min-width: 20px;" th:text="${iterStat.count}">1</span>
+                            <div>
+                                <h6 class="fw-bold m-0" style="font-size: 0.95rem; line-height: 1.3;">
+                                    <a th:href="@{|/post/detail/${tPost.id}|}" class="text-decoration-none text-dark" th:text="${tPost.title}">Trending Post Title</a>
+                                </h6>
+                                <div class="small text-muted mt-1" style="font-size: 0.75rem;">
+                                    <span th:text="${tPost.author}">Author</span> | 
+                                    <i class="fa-regular fa-thumbs-up ms-1 me-1"></i><span th:text="${tPost.recommends}">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <p th:if="${trendingPosts == null or trendingPosts.isEmpty()}" class="text-muted small">아직 추천받은 게시물이 없습니다.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4. Footer Area -->
+<div class="footer-area mt-5">
+    <div th:replace="~{common/layout :: footer}"></div>
+</div>
+
+</body>
+</html>

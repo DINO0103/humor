@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('랭킹')}"></head>
+<body>
+
+<div th:replace="~{common/layout :: gameHeader}"></div>
+
+<div class="container content-container">
+    <div class="row mt-5">
+        <div class="col-12 text-center mb-5">
+            <h2 class="nyt-logo" style="font-size: 3rem; color: #0d6efd;">TOP RANKERS</h2>
+            <p class="text-muted">The best players of the week</p>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm" style="border-top: 4px solid #0d6efd;">
+                <div class="card-header bg-white border-0 pt-4 text-center">
+                    <i class="fa-solid fa-shapes fa-2x mb-2 text-primary"></i>
+                    <h5 class="fw-bold">TETRIS</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover small">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>NICKNAME</th>
+                                <th class="text-end">SCORE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>Admin</td><td class="text-end fw-bold">1,250</td></tr>
+                            <tr><td>2</td><td>User1</td><td class="text-end fw-bold">980</td></tr>
+                            <tr><td>3</td><td>Gamer7</td><td class="text-end fw-bold">850</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm" style="border-top: 4px solid #0d6efd;">
+                <div class="card-header bg-white border-0 pt-4 text-center">
+                    <i class="fa-solid fa-worm fa-2x mb-2 text-primary"></i>
+                    <h5 class="fw-bold">SNAKE</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover small">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>NICKNAME</th>
+                                <th class="text-end">SCORE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>Python</td><td class="text-end fw-bold">450</td></tr>
+                            <tr><td>2</td><td>Admin</td><td class="text-end fw-bold">320</td></tr>
+                            <tr><td>3</td><td>User2</td><td class="text-end fw-bold">280</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm" style="border-top: 4px solid #0d6efd;">
+                <div class="card-header bg-white border-0 pt-4 text-center">
+                    <i class="fa-solid fa-bomb fa-2x mb-2 text-primary"></i>
+                    <h5 class="fw-bold">MINESWEEPER</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover small">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>NICKNAME</th>
+                                <th class="text-end">TIME</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>Admin</td><td class="text-end fw-bold">0:45</td></tr>
+                            <tr><td>2</td><td>Speedy</td><td class="text-end fw-bold">0:52</td></tr>
+                            <tr><td>3</td><td>Clicker</td><td class="text-end fw-bold">1:05</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{common/layout :: footer}"></div>
+
+</body>
+</html>

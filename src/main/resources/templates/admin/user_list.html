@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('사용자 관리')}"></head>
+<body class="admin-bg">
+<div th:replace="~{common/layout :: header}"></div>
+
+<div class="container content-container py-4">
+    <div class="row g-5">
+        <!-- Sidebar -->
+        <div th:replace="~{common/layout :: adminSidebar('users')}"></div>
+        
+        <!-- Content -->
+        <div class="col-md-9 col-lg-9">
+            <div class="admin-content-header d-flex justify-content-between align-items-end mb-4">
+                <h2>사용자 관리</h2>
+                <div class="text-muted small fw-bold text-uppercase pb-2">전체: <span class="text-dark" th:text="${users.size()}">0</span> 명의 구독자</div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table admin-table align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">ID</th>
+                            <th>아이디</th>
+                            <th>닉네임</th>
+                            <th>이메일 주소</th>
+                            <th style="width: 100px;">권한</th>
+                            <th style="width: 120px;">상태</th>
+                            <th class="text-end" style="width: 100px;">작업</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user : ${users}">
+                            <td class="fw-bold" th:text="${user.id}">1</td>
+                            <td class="fw-bold" th:text="${user.username}">username</td>
+                            <td th:text="${user.nickname}">nickname</td>
+                            <td class="text-muted" th:text="${user.email}">email@test.com</td>
+                            <td>
+                                <span th:if="${user.role == 'ROLE_ADMIN'}" class="badge-nyt border-dark text-dark">관리자</span>
+                                <span th:if="${user.role != 'ROLE_ADMIN'}" class="badge-nyt">일반</span>
+                            </td>
+                            <td>
+                                <span th:if="${user.suspendedUntil != null && user.suspendedUntil.isAfter(T(java.time.LocalDateTime).now())}" class="text-danger fw-bold small">
+                                    이용 정지
+                                </span>
+                                <span th:unless="${user.suspendedUntil != null && user.suspendedUntil.isAfter(T(java.time.LocalDateTime).now())}" class="text-success small fw-bold">
+                                    정상
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="dropdown">
+                                    <button class="btn btn-island dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        관리
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end border-dark rounded-0 shadow-sm">
+                                        <li>
+                                            <form th:action="@{|/admin/users/suspend/${user.id}|}" method="post">
+                                                <input type="hidden" name="days" value="7">
+                                                <button type="submit" class="dropdown-item py-2 small fw-bold text-uppercase">7일 정지</button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <form th:action="@{|/admin/users/suspend/${user.id}|}" method="post">
+                                                <input type="hidden" name="days" value="30">
+                                                <button type="submit" class="dropdown-item py-2 small fw-bold text-uppercase">30일 정지</button>
+                                            </form>
+                                        </li>
+                                        <li th:if="${user.role != 'ROLE_ADMIN'}">
+                                            <div class="dropdown-divider"></div>
+                                            <form th:action="@{|/admin/users/promote/${user.id}|}" method="post">
+                                                <button type="submit" class="dropdown-item py-2 small fw-bold text-primary text-uppercase">관리자로 승격</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{common/layout :: footer}"></div>
+</body>
+</html>

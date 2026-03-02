@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('분류 관리')}"></head>
+<body class="admin-bg">
+<div th:replace="~{common/layout :: header}"></div>
+
+<div class="container content-container py-4">
+    <div class="row g-5">
+        <!-- Sidebar -->
+        <div th:replace="~{common/layout :: adminSidebar('categories')}"></div>
+        
+        <!-- Content -->
+        <div class="col-md-9 col-lg-9">
+            <div class="admin-content-header d-flex justify-content-between align-items-end mb-4">
+                <div class="d-flex align-items-center">
+                    <h2 class="m-0">분류 관리</h2>
+                    <span class="ms-3 text-muted small fw-bold text-uppercase border-start ps-3" style="letter-spacing: 0.5px;">
+                        핸들 <i class="fa-solid fa-grip-vertical mx-1"></i> 을 드래그하여 순서를 변경하세요
+                    </span>
+                </div>
+                <button class="btn btn-island" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                    새 분류 추가
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table admin-table align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"></th>
+                            <th style="width: 60px;">순번</th>
+                            <th style="width: 80px;">아이콘</th>
+                            <th>분류명</th>
+                            <th style="width: 120px;">노출 상태</th>
+                            <th class="text-end" style="width: 150px;">작업</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sortable-tbody">
+                        <tr th:each="category : ${categories}" class="category-row" th:data-id="${category.id}">
+                            <td class="ps-2">
+                                <div class="drag-handle text-muted" style="cursor: grab;">
+                                    <i class="fa-solid fa-grip-vertical"></i>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-bold order-badge" th:text="${category.orders}">1</span>
+                            </td>
+                            <td>
+                                <i th:class="|fa-solid ${category.icon} text-dark fs-5|"></i>
+                            </td>
+                            <td class="fw-bold fs-5" style="font-family: 'Noto Serif KR', serif;" th:text="${category.name}" th:classappend="${category.isHidden ? 'text-muted text-decoration-line-through opacity-50' : ''}">
+                                분류명
+                            </td>
+                            <td>
+                                <span th:if="${category.isHidden}" class="text-uppercase small fw-bold text-muted">숨김</span>
+                                <span th:unless="${category.isHidden}" class="text-uppercase small fw-bold">표시 중</span>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button class="btn btn-island edit-btn" 
+                                            th:data-id="${category.id}"
+                                            th:data-name="${category.name}"
+                                            th:data-icon="${category.icon}"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editCategoryModal">
+                                        수정
+                                    </button>
+                                    <form th:action="@{|/admin/categories/hide/${category.id}|}" method="post">
+                                        <button type="submit" class="btn btn-island" th:text="${category.isHidden ? '표시' : '숨기기'}">숨기기</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals (Add/Edit) -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-dark rounded-0 shadow-lg">
+            <form th:action="@{/admin/categories/add}" method="post">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-uppercase" style="font-family: 'Playfair Display', serif;">새 분류 등록</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase">분류 제목</label>
+                        <input type="text" name="name" class="form-control rounded-0 border-dark" placeholder="분류명을 입력하세요" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase">아이콘 선택</label>
+                        <select name="icon" class="form-select rounded-0 border-dark" required>
+                            <option value="fa-star">별 (Star)</option>
+                            <option value="fa-crown">왕관 (Crown)</option>
+                            <option value="fa-bolt">번개 (Bolt/Breaking)</option>
+                            <option value="fa-fire">불 (Hot)</option>
+                            <option value="fa-face-laugh-squint">웃음 (Funny)</option>
+                            <option value="fa-circle-info">정보 (Info)</option>
+                            <option value="fa-comments">자유 (General)</option>
+                            <option value="fa-ellipsis">더보기 (More)</option>
+                            <option value="fa-gift">선물 (Gift)</option>
+                            <option value="fa-heart">하트 (Life)</option>
+                            <option value="fa-gamepad">게임 (Gaming)</option>
+                        </select>
+                    </div>
+                    <input type="hidden" name="orders" value="99">
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-island w-100 py-2">분류 생성하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editCategoryModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-dark rounded-0 shadow-lg">
+            <form id="editForm" method="post">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-uppercase" style="font-family: 'Playfair Display', serif;">분류 정보 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase">분류 제목</label>
+                        <input type="text" name="name" id="editName" class="form-control rounded-0 border-dark" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase">아이콘 변경</label>
+                        <select name="icon" id="editIcon" class="form-select rounded-0 border-dark" required>
+                            <option value="fa-star">별 (Star)</option>
+                            <option value="fa-crown">왕관 (Crown)</option>
+                            <option value="fa-bolt">번개 (Bolt/Breaking)</option>
+                            <option value="fa-fire">불 (Hot)</option>
+                            <option value="fa-face-laugh-squint">웃음 (Funny)</option>
+                            <option value="fa-circle-info">정보 (Info)</option>
+                            <option value="fa-comments">자유 (General)</option>
+                            <option value="fa-ellipsis">더보기 (More)</option>
+                            <option value="fa-gift">선물 (Gift)</option>
+                            <option value="fa-heart">하트 (Life)</option>
+                            <option value="fa-gamepad">게임 (Gaming)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-island w-100 py-2">변경 사항 저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{common/layout :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('.edit-btn').on('click', function() {
+        $('#editName').val($(this).data('name'));
+        $('#editIcon').val($(this).data('icon'));
+        $('#editForm').attr('action', '/admin/categories/edit/' + $(this).data('id'));
+    });
+
+    const el = document.getElementById('sortable-tbody');
+    if (el) {
+        new Sortable(el, {
+            animation: 150, handle: '.drag-handle', ghostClass: 'bg-light',
+            onEnd: function() {
+                const ids = [];
+                $('.category-row').each(function() { ids.push(parseInt($(this).data('id'))); });
+                $('.order-badge').each(function(i) { $(this).text(i + 1); });
+                fetch('/admin/categories/reorder', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', [$(\"meta[name='_csrf_header']\").attr(\"content\")]: $(\"meta[name='_csrf']\").attr(\"content\") },
+                    body: JSON.stringify(ids)
+                });
+            }
+        });
+    }
+});
+</script>
+</body>
+</html>

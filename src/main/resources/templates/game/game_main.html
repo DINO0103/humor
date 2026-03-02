@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('게임 센터')}"></head>
+<body>
+
+<div th:replace="~{common/layout :: gameHeader}"></div>
+
+<div class="container content-container">
+    <div class="row mt-5">
+        <div class="col-12 text-center mb-5">
+            <h2 class="section-title" style="display: inline-block; padding: 0 30px;">POPULAR GAMES</h2>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm" style="border-radius: 12px; overflow: hidden; transition: transform 0.3s;">
+                <div class="bg-dark d-flex align-items-center justify-content-center" style="height: 200px; color: white;">
+                    <i class="fa-solid fa-shapes fa-5x"></i>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title fw-bold">TETRIS</h5>
+                    <p class="card-text text-muted small">Classic block-stacking puzzle game.</p>
+                    <a th:href="@{/tetris}" class="btn btn-primary w-100 fw-bold">PLAY NOW</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm" style="border-radius: 12px; overflow: hidden; transition: transform 0.3s;">
+                <div class="bg-primary d-flex align-items-center justify-content-center" style="height: 200px; color: white; background: linear-gradient(45deg, #0d6efd, #0dcaf0);">
+                    <i class="fa-solid fa-worm fa-5x"></i>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title fw-bold">SNAKE</h5>
+                    <p class="card-text text-muted small">Eat and grow as much as you can.</p>
+                    <a th:href="@{/snake}" class="btn btn-primary w-100 fw-bold">PLAY NOW</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm" style="border-radius: 12px; overflow: hidden; transition: transform 0.3s;">
+                <div class="bg-primary d-flex align-items-center justify-content-center" style="height: 200px; color: white; background: linear-gradient(45deg, #0d6efd, #6610f2);">
+                    <i class="fa-solid fa-bomb fa-5x"></i>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title fw-bold">MINESWEEPER</h5>
+                    <p class="card-text text-muted small">Clear the grid without hitting a mine.</p>
+                    <a th:href="@{/minesweeper}" class="btn btn-primary w-100 fw-bold">PLAY NOW</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{common/layout :: footer}"></div>
+
+<style>
+    .card:hover {
+        transform: translateY(-10px);
+    }
+</style>
+
+</body>
+</html>

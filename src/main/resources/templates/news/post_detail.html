@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Post Detail')}"></head>
+<body>
+
+<div th:replace="~{common/layout :: header}"></div>
+
+<div class="container article-container" style="max-width: 1080px; margin: 0 auto; padding: 0 15px;">
+    <div class="row">
+        <div class="col-lg-9 pe-lg-4">
+            <span class="category-name text-uppercase fw-bold small" th:text="${post.category}" style="letter-spacing: 1px;">Category</span>
+            <h1 class="article-title mt-2 mb-4" style="font-family: var(--nyt-font-serif); font-size: 1.0rem; font-weight: 700; line-height: 1.2;">
+                <span th:text="${post.title}">Post Title Here</span>
+                <span class="text-danger ms-1" style="font-size: 0.85rem;" th:if="${post.commentList != null and !post.commentList.isEmpty()}" th:text="'(' + ${post.commentList.size()} + ')'"></span>
+            </h1>
+            
+            <div class="article-meta d-flex justify-content-between align-items-center py-3 border-top border-bottom mb-4" style="color: var(--nyt-gray); font-size: 0.9rem;">
+                <div>
+                    작성자 <strong class="text-dark" th:text="${post.author}">Author</strong> 
+                    <span class="text-muted small ms-1" th:if="${post.ipAddress != null}" th:text="'(IP: ' + ${post.ipAddress} + ')'">(IP: 127.0.0.1)</span> | 
+                    <span th:text="${#temporals.format(post.createDate, 'yyyy년 M월 d일 HH:mm')}">March 2, 2026</span>
+                </div>
+                <div>
+                    조회 <span th:text="${post.views}">0</span> | 추천 <strong class="text-danger" th:text="${post.recommends}">0</strong>
+                </div>
+            </div>
+
+            <!-- Content Island -->
+            <div class="content-island p-4 mb-4" style="background-color: #fafafa; border: 1px solid #e9ecef; border-radius: 8px;">
+                <!-- Content Area (Summernote HTML render) -->
+                <div class="article-content mb-5" th:utext="${post.content}" style="font-family: var(--nyt-font-serif); font-size: 1.1rem; line-height: 1.8; color: #333; overflow-x: auto;">
+                    Post content goes here...
+                </div>
+
+                <!-- File Attachments Area -->
+                <div th:if="${post.fileList != null and !post.fileList.isEmpty()}" class="attachments-area mb-4 p-3" style="background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 6px;">
+                    <h6 class="fw-bold mb-3" style="font-family: var(--nyt-font-serif);"><i class="fa-solid fa-paperclip me-2"></i>첨부파일</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li th:each="file : ${post.fileList}" class="mb-2">
+                            <a th:href="${file.filePath}" target="_blank" class="text-decoration-none text-dark fw-bold">
+                                <i class="fa-regular fa-file me-2"></i><span th:text="${file.originalFileName}">filename.txt</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Recommend Button -->
+                <div class="d-flex justify-content-center mt-5 mb-2">
+                    <form th:action="@{|/post/recommend/${post.id}|}" method="post">
+                        <button type="submit" class="btn btn-outline-dark px-4 py-2" style="border-radius: 20px; font-weight: bold;">
+                            <i class="fa-regular fa-thumbs-up me-2"></i>추천 <span th:text="${post.recommends}">0</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Comments Island -->
+            <div class="comments-island p-4 mb-5" style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px;">
+                <h5 class="fw-bold mb-4" style="font-family: var(--nyt-font-serif); font-size: 0.9rem;"><i class="fa-regular fa-comments me-2"></i>댓글</h5>
+                
+                <!-- Comment List -->
+                <div class="comment-list-area p-3 mb-4" style="background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 6px;" th:if="${post.commentList != null and !post.commentList.isEmpty()}">
+                    <div th:each="comment : ${post.commentList}" th:if="${comment.parent == null}" class="comment-item mb-3 pb-3 border-bottom last-no-border" th:id="'comment_' + ${comment.id}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong class="text-dark" th:text="${comment.author != null ? comment.author.nickname : '익명'}">Nickname</strong>
+                                <span class="text-muted small ms-2" th:text="${comment.createDate != null ? #temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm') : '-'}">Date</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline-secondary py-0" style="font-size: 0.75rem; border-radius: 4px;" th:onclick="'toggleReplyForm(' + ${comment.id} + ')'">답글</button>
+                        </div>
+                        <div class="comment-content mt-2 text-dark" th:text="${comment.content}" style="font-size: 0.95rem;">Comment text</div>
+                        
+                        <!-- Replies (Nested) -->
+                        <div class="replies-list ms-4 mt-3 ps-3 border-start border-2" th:if="${comment.children != null and !comment.children.isEmpty()}">
+                            <div th:each="reply : ${comment.children}" class="reply-item mb-2" th:id="'comment_' + ${reply.id}">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <i class="fa-solid fa-arrow-turn-up fa-rotate-90 text-muted me-2 small"></i>
+                                        <strong class="text-dark" th:text="${reply.author != null ? reply.author.nickname : '익명'}">Nickname</strong>
+                                        <span class="text-muted small ms-2" th:text="${reply.createDate != null ? #temporals.format(reply.createDate, 'yyyy-MM-dd HH:mm') : '-'}">Date</span>
+                                    </div>
+                                </div>
+                                <div class="reply-content mt-1 text-dark" th:text="${reply.content}" style="font-size: 0.9rem;">Reply text</div>
+                            </div>
+                        </div>
+
+                        <!-- Reply Form (Hidden by default) -->
+                        <div th:id="'replyForm_' + ${comment.id}" class="reply-form ms-4 mt-3 d-none">
+                            <form th:action="@{|/comment/create/${post.id}|}" method="post">
+                                <input type="hidden" name="parentId" th:value="${comment.id}">
+                                <div class="input-group">
+                                    <textarea name="content" class="form-control bg-light" rows="2" placeholder="답글을 입력하세요" required style="border-radius: 4px 0 0 4px; font-size: 0.9rem; border-color: #ced4da;"></textarea>
+                                    <button type="submit" class="btn btn-dark" style="border-radius: 0 4px 4px 0;">등록</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Comment Form -->
+                <div class="comment-form">
+                    <form th:action="@{|/comment/create/${post.id}|}" method="post">
+                        <div class="mb-2">
+                            <textarea name="content" class="form-control" rows="3" placeholder="타인을 비방하거나 욕설이 포함된 댓글은 삭제될 수 있습니다." required style="border-radius: 6px; border: 1px solid #ced4da; font-size: 0.95rem;"></textarea>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-dark btn-sm px-4 py-2" style="border-radius: 6px; font-weight: bold;">댓글 등록</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-2">
+                <a th:href="@{/}" class="btn btn-outline-dark" style="border-radius: 4px;"><i class="fa-solid fa-list me-2"></i>목록으로</a>
+            </div>
+        </div>
+        
+        <!-- Sidebar remains consistent -->
+        <div class="col-lg-3 sidebar-section border-start">
+            <h3 class="section-title" style="font-family: var(--nyt-font-serif); font-size: 1.2rem; border-bottom: 1px solid #121212; padding-bottom: 5px; margin-bottom: 15px;">관련 뉴스</h3>
+            <p class="small text-muted">카테고리의 다른 글들이 곧 업데이트됩니다...</p>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{common/layout :: footer}"></div>
+
+<script>
+    function toggleReplyForm(commentId) {
+        const form = document.getElementById('replyForm_' + commentId);
+        if (form.classList.contains('d-none')) {
+            form.classList.remove('d-none');
+        } else {
+            form.classList.add('d-none');
+        }
+    }
+</script>
+    </div>
+</div>
+
+<div th:replace="~{common/layout :: footer}"></div>
+
+</body>
+</html>

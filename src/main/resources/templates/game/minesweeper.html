@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('지뢰찾기')}"></head>
+<style>
+    #mines-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 50px;
+        margin-bottom: 100px;
+    }
+    #game-grid {
+        display: grid;
+        grid-template-columns: repeat(10, 35px);
+        grid-template-rows: repeat(10, 35px);
+        gap: 3px;
+        border: 8px solid #f0f7ff;
+        background-color: #f0f7ff;
+        padding: 5px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .cell {
+        width: 35px; height: 35px;
+        background-color: #0d6efd;
+        color: white;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: bold; cursor: pointer; user-select: none;
+        border-radius: 4px; transition: all 0.1s;
+    }
+    .cell:hover { background-color: #0b5ed7; transform: scale(1.05); }
+    .cell.revealed {
+        background-color: #fff;
+        color: #121212;
+        border: 1px solid #dee2e6;
+        cursor: default;
+    }
+    .cell.revealed:hover { transform: none; }
+    .cell.mine { background-color: #ff4d4d; color: white; }
+    .cell.flagged { background-color: #ffc107; }
+    
+    .game-status-box {
+        margin-top: 30px; text-align: center;
+        font-family: 'Playfair Display', serif;
+    }
+    .mine-count { font-size: 2rem; font-weight: bold; color: #0d6efd; }
+</style>
+<body>
+<div th:replace="~{common/layout :: gameHeader}"></div>
+<div class="container content-container">
+    <div id="mines-container">
+        <h1 class="nyt-logo mb-4" style="color: #0d6efd; font-size: 3.5rem;">MINESWEEPER</h1>
+        <div id="game-grid"></div>
+        <div class="game-status-box">
+            <div id="status" class="mb-2 h4 fw-bold">FIND ALL MINES</div>
+            <div class="small text-muted mb-3">RIGHT CLICK TO FLAG</div>
+            <button onclick="initGame()" class="btn btn-primary px-5 fw-bold">RESTART</button>
+        </div>
+        <div class="mt-5">
+            <a th:href="@{/game}" class="btn btn-outline-primary btn-sm">BACK TO HUB</a>
+        </div>
+    </div>
+</div>
+<div th:replace="~{common/layout :: footer}"></div>
+
+<script>
+    const grid = document.getElementById('game-grid');
+    const status = document.getElementById('status');
+    const size = 10;
+    const minesCount = 12;
+    let cells = [];
+    let isGameOver = false;
+
+    function initGame() {
+        grid.innerHTML = '';
+        cells = [];
+        isGameOver = false;
+        status.innerText = 'FIND ALL MINES';
+        status.style.color = '#121212';
+        
+        for (let i = 0; i < size * size; i++) {
+            const cellElement = document.createElement('div');
+            cellElement.classList.add('cell');
+            cellElement.addEventListener('click', () => reveal(i));
+            cellElement.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                flag(i);
+            });
+            grid.appendChild(cellElement);
+            cells.push({
+                element: cellElement,
+                mine: false,
+                revealed: false,
+                flagged: false,
+                neighborMines: 0
+            });
+        }
+
+        // Place mines
+        let placedMines = 0;
+        while (placedMines < minesCount) {
+            let idx = Math.floor(Math.random() * size * size);
+            if (!cells[idx].mine) {
+                cells[idx].mine = true;
+                placedMines++;
+            }
+        }
+
+        // Calculate neighbors
+        for (let i = 0; i < size * size; i++) {
+            if (cells[i].mine) continue;
+            let count = 0;
+            const neighbors = getNeighbors(i);
+            neighbors.forEach(n => {
+                if (cells[n].mine) count++;
+            });
+            cells[i].neighborMines = count;
+        }
+    }
+
+    function getNeighbors(idx) {
+        const neighbors = [];
+        const x = idx % size;
+        const y = Math.floor(idx / size);
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                if (dx === 0 && dy === 0) continue;
+                const nx = x + dx;
+                const ny = y + dy;
+                if (nx >= 0 && nx < size && ny >= 0 && ny < size) {
+                    neighbors.push(ny * size + nx);
+                }
+            }
+        }
+        return neighbors;
+    }
+
+    function reveal(idx) {
+        if (isGameOver || cells[idx].revealed || cells[idx].flagged) return;
+
+        const cell = cells[idx];
+        cell.revealed = true;
+        cell.element.classList.add('revealed');
+
+        if (cell.mine) {
+            cell.element.classList.add('mine');
+            cell.element.innerHTML = '<i class="fa-solid fa-bomb"></i>';
+            gameOver(false);
+            return;
+        }
+
+        if (cell.neighborMines > 0) {
+            cell.element.innerText = cell.neighborMines;
+            const colors = ['', '#0d6efd', '#198754', '#dc3545', '#6610f2', '#fd7e14', '#0dcaf0', '#212529', '#6c757d'];
+            cell.element.style.color = colors[cell.neighborMines];
+        } else {
+            const neighbors = getNeighbors(idx);
+            neighbors.forEach(n => reveal(n));
+        }
+
+        checkWin();
+    }
+
+    function flag(idx) {
+        if (isGameOver || cells[idx].revealed) return;
+        const cell = cells[idx];
+        cell.flagged = !cell.flagged;
+        cell.element.classList.toggle('flagged');
+        cell.element.innerHTML = cell.flagged ? '<i class="fa-solid fa-flag"></i>' : '';
+    }
+
+    function gameOver(win) {
+        isGameOver = true;
+        if (win) {
+            status.innerText = 'MISSION ACCOMPLISHED';
+            status.style.color = '#198754';
+        } else {
+            status.innerText = 'MISSION FAILED';
+            status.style.color = '#dc3545';
+            cells.forEach(c => {
+                if (c.mine) {
+                    c.element.classList.add('mine');
+                    c.element.innerHTML = '<i class="fa-solid fa-bomb"></i>';
+                }
+            });
+        }
+    }
+
+    function checkWin() {
+        const win = cells.every(cell => cell.mine || cell.revealed);
+        if (win) gameOver(true);
+    }
+
+    initGame();
+</script>
+</body>
+</html>
